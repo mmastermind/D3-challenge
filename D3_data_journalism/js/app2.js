@@ -42,7 +42,7 @@ function xScale(dataset, chosenXAxis) {
 function yScale(dataset, chosenYAxis) {
     // create scales
     var yLinearScale = d3.scaleLinear()
-      .domain([d3.min(dataset, d => d[chosenYAxis]) * 0.8,
+      .domain([d3.min(dataset, d => d[chosenYAxis]) * 0.6,
         d3.max(dataset, d=> d[chosenYAxis]) * 1.2
       ])
       .range([height, 0]);
@@ -61,7 +61,7 @@ function yScale(dataset, chosenYAxis) {
   
   function renderAxes2(newYScale, yAxis) {
     var leftAxis = d3.axisLeft(newYScale);
-    YAxis.transition()
+    yAxis.transition()
       .duration(1000)
       .call(leftAxis);
     return yAxis;
@@ -197,18 +197,18 @@ function yScale(dataset, chosenYAxis) {
 
     // Create group for  2 Y- axis labels
     var labelsGroup2 = chartGroup.append("g") //is "g" as parameter right or "text" as initially was?     chartGroup.append("text")
-        .attr(50, 200);
+        .attr("transform",`translate(-90,${height / 2})`)
         // .attr("y", 0 - margin.left)
         // .attr("x", 0 - (height / 2))
     
     var obesityLabel = labelsGroup2.append("text")
-        .attr("x", 40)
-        .attr("y", 0)
+        .attr("x", 0)
+        .attr("y", 40)
         .attr("transform", "rotate(-90)")
         .attr("dy", "1em") //what is this for??? CHECK  
         .attr("value", "obesity") // value to grab for event listener
         .classed("active", true)
-        .classed("axis-text", true)
+        // .classed("axis-text", true)
         .text("Obese%");
   
     //   .attr("transform", "rotate(-90)")
@@ -217,12 +217,12 @@ function yScale(dataset, chosenYAxis) {
     //   .text("Obese (%)");
     var hcLabel = labelsGroup2.append("text")
         .attr("x", 0)
-        .attr("y", 0)
+        .attr("y", 20)
         .attr("transform", "rotate(-90)")
         .attr("dy", "1em") //what is this for??? CHECK  
         .attr("value", "healthcare") // value to grab for event listener
         .classed("inactive", true)
-        .classed("axis-text", true)
+        // .classed("axis-text", true)
         .text("Lacks Healthcare (%)");
   
     // updateToolTip function above csv import
@@ -273,6 +273,7 @@ function yScale(dataset, chosenYAxis) {
         }
       });
 
+    // y axis labels event listener
     labelsGroup2.selectAll("text")
     .on("click", function() {
     // get value of selection
@@ -282,7 +283,7 @@ function yScale(dataset, chosenYAxis) {
         // replaces chosenXAxis with value
         chosenYAxis = value;
 
-        console.log(chosenYAxis)
+        // console.log(chosenYAxis)
 
         // functions here found above csv import
         // updates y scale for new data
