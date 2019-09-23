@@ -80,7 +80,7 @@ function yScale(dataset, chosenYAxis) {
   }
   
   // function used for updating circles group with new tooltip
-  function updateToolTip(chosenXAxis, circlesGroup, chosenYAxis) {
+  function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
   
     if (chosenXAxis === "poverty") {
       var label = "In Poverty:";
@@ -150,7 +150,7 @@ function yScale(dataset, chosenYAxis) {
     //   .domain([0, d3.max(dataset, d => d.obesity)])
     //   .range([height, 0]);
   
-    // Create initial axis functions
+    // Create initial axis functions CHECK IF "axisLeft" is the right syntaxis for parameter
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
   
@@ -197,13 +197,12 @@ function yScale(dataset, chosenYAxis) {
 
     // Create group for  2 Y- axis labels
     var labelsGroup2 = chartGroup.append("g") //is "g" as parameter right or "text" as initially was?     chartGroup.append("text")
-
-        .attr("transform", `translate(${0-(margin.left/2)}, ${0-(height/2)})`);
+        .attr(50, 200);
         // .attr("y", 0 - margin.left)
         // .attr("x", 0 - (height / 2))
     
     var obesityLabel = labelsGroup2.append("text")
-        .attr("x", 20)
+        .attr("x", 40)
         .attr("y", 0)
         .attr("transform", "rotate(-90)")
         .attr("dy", "1em") //what is this for??? CHECK  
@@ -217,7 +216,7 @@ function yScale(dataset, chosenYAxis) {
     //   .classed("axis-text", true)
     //   .text("Obese (%)");
     var hcLabel = labelsGroup2.append("text")
-        .attr("x", -20)
+        .attr("x", 0)
         .attr("y", 0)
         .attr("transform", "rotate(-90)")
         .attr("dy", "1em") //what is this for??? CHECK  
@@ -249,10 +248,10 @@ function yScale(dataset, chosenYAxis) {
           xAxis = renderAxes(xLinearScale, xAxis);
   
           // updates circles with new x values
-          circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+          circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
   
           // updates tooltips with new info
-          circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+          circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
   
           // changes classes to change bold text
           if (chosenXAxis === "age") {
@@ -283,7 +282,7 @@ function yScale(dataset, chosenYAxis) {
         // replaces chosenXAxis with value
         chosenYAxis = value;
 
-        console.log(chosenXAxis)
+        console.log(chosenYAxis)
 
         // functions here found above csv import
         // updates y scale for new data
@@ -292,11 +291,11 @@ function yScale(dataset, chosenYAxis) {
         // updates y axis with transition
         yAxis = renderAxes2(yLinearScale, yAxis);
 
-        // updates circles with new x values
-        circlesGroup = renderCircles(circlesGroup, yLinearScale, chosenYAxis);
-
+        // updates circles with new y values
+        circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+  
         // updates tooltips with new info
-        circlesGroup = updateToolTip(chosenYAxis, circlesGroup);
+        circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
         // changes classes to change bold text
         if (chosenYAxis === "healthcare") {
