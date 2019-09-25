@@ -69,23 +69,34 @@ function yScale(dataset, chosenYAxis) {
 
   // function used for updating circles group with a transition to
   // new circles - CHECK IF THE "CY" ATTR IS OK
-  function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis, circletext) {
+  function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
   
     circlesGroup.transition()
       .duration(750)
       .attr("cx", d => newXScale(d[chosenXAxis]))
       .attr("cy", d => newYScale(d[chosenYAxis]))
-      .text(circletext);
+      // .text(circletext);
     return circlesGroup;
   }
   
-  function renderCircles2(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis, circletext) {
+  function renderCircles2(circletext, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis) {
   
-    circletext.transition()
-      .duration(750)
-      .attr("x", d => newXScale(d[chosenXAxis]))
-      .attr("y", d => newYScale(d[chosenYAxis]))
-
+    circletext
+      // .transition()
+      // .duration(750)
+      // .data(dataset)
+      // .enter()
+      // .append("text")
+      .attr("x", d => xLinearScale(d[chosenXAxis]))
+      .attr("y", d => yLinearScale(d[chosenYAxis]))
+      // .text(function(d) { 
+      //   return (`${d.abbr}`); 
+      //   })
+      // .attr("font-family", "sans-serif")
+      // .attr("font-size", "10px")
+      // .attr("fill", "white")
+      // .attr("anchor", "middle")
+      // .attr("stroke-width","2px");
     return circletext;
   }
 
@@ -93,19 +104,22 @@ function yScale(dataset, chosenYAxis) {
   function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
   
     if (chosenXAxis === "poverty") {
-      var label = "In Poverty:";
+      var label = "poverty";
     }
     else if (chosenXAxis === "age") {
-      var label = "Age (Median):";
+      var label = "age";
     } 
     else {
       var label = "income";
     }
     if (chosenYAxis === "obesity") {
-        var label2 = "Obese (%):";
+        var label2 = "obesity";
       }
-    else {
-        var label2 = "Lacks Healthcare:";
+    else if (chosenYAxis === "healthcare") {
+      var label2 = "healthcare";
+    } 
+    else  {
+        var label2 = "smokes:";
       }
   
 //   check what "label" stands for after line break
@@ -117,9 +131,9 @@ function yScale(dataset, chosenYAxis) {
       });
   
     circlesGroup.call(toolTip);
-  
+      // onmousein event
     circlesGroup.on("mouseover", function(data) {
-      toolTip.show(data);
+    toolTip.show(data);
     })
       // onmouseout event
       .on("mouseout", function(data, index) {
@@ -129,24 +143,24 @@ function yScale(dataset, chosenYAxis) {
     return circlesGroup;
   }
 
-  function updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext) {
+  // function updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext, xLinearScale, yLinearScale) {
   
-    var circletext = chartGroup.selectAll("text")
-      .data(dataset)
-      .enter()
-      .append("text")
-      .attr("x", d => xLinearScale(d[chosenXAxis]))
-      .attr("y", d => yLinearScale(d[chosenYAxis]))
-      .text(function(d) { 
-        return (`${d.abbr}`); 
-        })
-      .attr("font-family", "sans-serif")
-      .attr("font-size", "10px")
-      .attr("fill", "white")
-      .attr("anchor", "middle")
-      .attr("stroke-width","2px");
-    return circletext;
-  }
+  //   var circletext = chartGroup.selectAll("text")
+  //     .data(dataset)
+  //     .enter()
+  //     .append("text")
+  //     .attr("x", d => xLinearScale(d[chosenXAxis]))
+  //     .attr("y", d => yLinearScale(d[chosenYAxis]))
+  //     .text(function(d) { 
+  //       return (`${d.abbr}`); 
+  //       })
+  //     .attr("font-family", "sans-serif")
+  //     .attr("font-size", "10px")
+  //     .attr("fill", "white")
+  //     .attr("anchor", "middle")
+  //     .attr("stroke-width","2px");
+  //   return circletext;
+  // }
 
   // Retrieve data from the CSV file and execute everything below
   d3.csv("data/data3.csv", function(err, dataset) {
@@ -163,14 +177,14 @@ function yScale(dataset, chosenYAxis) {
       data.age = +data.age;
       data.income = +data.income;
       data.healthcare = +data.healthcare;
-    //   data.healthcareLow = +data.healthcareLow;
-    //   data.healthcareHigh = +data.healthcareHigh;
       data.obesity = +data.obesity;
-    //   data.obesityLow = +data.obesityLow;
-    //   data.obesityHigh = +data.obesityHigh;
       data.smokes = +data.smokes;
-    //   data.smokesLow = +data.smokesLow;
-    //   data.smokesHigh = +data.smokesHigh;
+      data.healthcareLow = +data.healthcareLow;
+      data.healthcareHigh = +data.healthcareHigh;
+      data.obesityLow = +data.obesityLow;
+      data.obesityHigh = +data.obesityHigh;
+      data.smokesLow = +data.smokesLow;
+      data.smokesHigh = +data.smokesHigh;
     });
     // xLinearScale function above csv import
     var xLinearScale = xScale(dataset, chosenXAxis);
@@ -206,22 +220,22 @@ function yScale(dataset, chosenYAxis) {
         .attr("opacity", ".5");
 
     // append initial circles text
-    var circletext = chartGroup.selectAll("text")
-      .data(dataset)
-      .enter()
-      .append("text")
-        .attr("x", d => xLinearScale(d[chosenXAxis]))
-        .attr("y", d => yLinearScale(d[chosenYAxis]))
-        .text(function(d) { 
-          return (`${d.abbr}`); 
-          })
-        .attr("font-family", "sans-serif")
-        .attr("font-size", "10px")
-        .attr("fill", "black")
-        .attr("anchor", "middle")
-        .attr("stroke-width","2px");
+    // var circletext = chartGroup.selectAll("text")
+    //   .data(dataset)
+    //   .enter()
+    //   .append("text")
+    //     .attr("x", d => xLinearScale(d[chosenXAxis]))
+    //     .attr("y", d => yLinearScale(d[chosenYAxis]))
+    //     .text(function(d) { 
+    //       return (`${d.abbr}`); 
+    //       })
+    //     .attr("font-family", "sans-serif")
+    //     .attr("font-size", "10px")
+    //     .attr("fill", "black")
+    //     .attr("anchor", "middle")
+    //     .attr("stroke-width","2px");
 
-    // Create group for  2 x- axis labels
+    // Create group for  3 x- axis labels
     var labelsGroup = chartGroup.append("g")
       .attr("transform", `translate(${width / 2}, ${height + 20})`);
   
@@ -246,7 +260,7 @@ function yScale(dataset, chosenYAxis) {
       .classed("inactive", true)
       .text("Household income (Median)");
 
-    // Create group for  2 Y- axis labels
+    // Create group for  3 Y- axis labels
     var labelsGroup2 = chartGroup.append("g") 
       .attr("transform",`translate(-90,${height / 2})`)
         // .attr("y", 0 - margin.left)
@@ -284,7 +298,7 @@ function yScale(dataset, chosenYAxis) {
   
     // updateToolTip function above csv import
     var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-    var circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext)
+    // var circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext)
 
     // x axis labels event listener
     labelsGroup.selectAll("text")
@@ -296,7 +310,7 @@ function yScale(dataset, chosenYAxis) {
           // replaces chosenXAxis with value
           chosenXAxis = value;
   
-          // console.log(chosenXAxis)
+          console.log(chosenXAxis)
   
           // functions here found above csv import
           // updates x scale for new data
@@ -306,31 +320,32 @@ function yScale(dataset, chosenYAxis) {
           xAxis = renderAxes(xLinearScale, xAxis);
   
           // updates circles with new x values
-          circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
-          circletext = renderCircles2(dataset, chosenXAxis, chosenYAxis, circletext)
-          
+          circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+          // circlesGroup = renderCircles2(circletext, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+            
           // updates tooltips with new info
           circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-          
+          // circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext, xLinearScale, yLinearScale);
+
           // changes classes to change bold text
-          if (chosenXAxis === "age") {
+          if (chosenXAxis === "poverty") {
             ageLabel
-              .classed("active", true)
-              .classed("inactive", false);
-            povertyLabel
               .classed("active", false)
               .classed("inactive", true);
+            povertyLabel
+              .classed("active", true)
+              .classed("inactive", false);
             incomeLabel
               .classed("active", false)
               .classed("inactive", true);
           }
-          else if (chosenXAxis === "poverty") {
+          else if (chosenXAxis === "age") {
             ageLabel
-              .classed("active", false)
-              .classed("inactive", true);
-            povertyLabel
               .classed("active", true)
               .classed("inactive", false);
+            povertyLabel
+              .classed("active", false)
+              .classed("inactive", true);
             incomeLabel
               .classed("active", false)
               .classed("inactive", true);
@@ -368,45 +383,45 @@ function yScale(dataset, chosenYAxis) {
         yAxis = renderAxes2(yLinearScale, yAxis);
 
         // updates circles with new y values
-        circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
-        circlesGroup = renderCircles2(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
+        circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis);
+        // circlesGroup = renderCircles2(xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
         
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-        // circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext)
+        // circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext);
 
         // changes classes to change bold text
-        if (chosenYAxis === "healthcare") {
+        if (chosenYAxis === "obesity") {
           hcLabel
-            .classed("active", true)
-            .classed("inactive", false);
-          obesityLabel
             .classed("active", false)
             .classed("inactive", true);
+          obesityLabel
+            .classed("active", true)
+            .classed("inactive", false);
           smokesLabel
             .classed("active", false)
             .classed("inactive", true);
         }
-        else if (chosenYAxis === "smokes") {
+        else if (chosenYAxis === "healthcare") {
           hcLabel
-            .classed("active", false)
-            .classed("inactive", true);
+            .classed("active", true)
+            .classed("inactive", false);
           obesityLabel
             .classed("active", false)
             .classed("inactive", true);
           smokesLabel
-            .classed("active", true)
-            .classed("inactive", false);
+            .classed("active", false)
+            .classed("inactive", true);
         } else {
           hcLabel
             .classed("active", false)
             .classed("inactive", true);
           obesityLabel
-            .classed("active", true)
-            .classed("inactive", false);
-          smokesLabel
             .classed("active", false)
             .classed("inactive", true);
+          smokesLabel
+            .classed("active", true)
+            .classed("inactive", false);
         }
       }
     });
