@@ -54,7 +54,7 @@ function yScale(dataset, chosenYAxis) {
   function renderAxes(newXScale, xAxis) {
     var bottomAxis = d3.axisBottom(newXScale);
     xAxis.transition()
-      .duration(1000)
+      .duration(750)
       .call(bottomAxis);
     return xAxis;
   }
@@ -62,7 +62,7 @@ function yScale(dataset, chosenYAxis) {
   function renderAxes2(newYScale, yAxis) {
     var leftAxis = d3.axisLeft(newYScale);
     yAxis.transition()
-      .duration(1000)
+      .duration(750)
       .call(leftAxis);
     return yAxis;
   }
@@ -72,14 +72,23 @@ function yScale(dataset, chosenYAxis) {
   function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis, circletext) {
   
     circlesGroup.transition()
-      .duration(1000)
+      .duration(750)
       .attr("cx", d => newXScale(d[chosenXAxis]))
       .attr("cy", d => newYScale(d[chosenYAxis]))
       .text(circletext);
-
     return circlesGroup;
   }
   
+  function renderCircles2(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis, circletext) {
+  
+    circletext.transition()
+      .duration(750)
+      .attr("x", d => newXScale(d[chosenXAxis]))
+      .attr("y", d => newYScale(d[chosenYAxis]))
+
+    return circletext;
+  }
+
   // function used for updating circles group with new tooltip
   function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
   
@@ -118,6 +127,25 @@ function yScale(dataset, chosenYAxis) {
       });
   
     return circlesGroup;
+  }
+
+  function updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext) {
+  
+    var circletext = chartGroup.selectAll("text")
+      .data(dataset)
+      .enter()
+      .append("text")
+      .attr("x", d => xLinearScale(d[chosenXAxis]))
+      .attr("y", d => yLinearScale(d[chosenYAxis]))
+      .text(function(d) { 
+        return (`${d.abbr}`); 
+        })
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "10px")
+      .attr("fill", "white")
+      .attr("anchor", "middle")
+      .attr("stroke-width","2px");
+    return circletext;
   }
 
   // Retrieve data from the CSV file and execute everything below
@@ -174,9 +202,10 @@ function yScale(dataset, chosenYAxis) {
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d[chosenYAxis]))
         .attr("r", 20)
-        .attr("fill", "red")
+        .attr("fill", "orange")
         .attr("opacity", ".5");
 
+    // append initial circles text
     var circletext = chartGroup.selectAll("text")
       .data(dataset)
       .enter()
@@ -188,7 +217,7 @@ function yScale(dataset, chosenYAxis) {
           })
         .attr("font-family", "sans-serif")
         .attr("font-size", "10px")
-        .attr("fill", "white")
+        .attr("fill", "black")
         .attr("anchor", "middle")
         .attr("stroke-width","2px");
 
@@ -254,8 +283,9 @@ function yScale(dataset, chosenYAxis) {
 
   
     // updateToolTip function above csv import
-    var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup, circletext);
-  
+    var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+    var circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext)
+
     // x axis labels event listener
     labelsGroup.selectAll("text")
       .on("click", function() {
@@ -277,10 +307,11 @@ function yScale(dataset, chosenYAxis) {
   
           // updates circles with new x values
           circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
-  
+          circletext = renderCircles2(dataset, chosenXAxis, chosenYAxis, circletext)
+          
           // updates tooltips with new info
           circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-  
+          
           // changes classes to change bold text
           if (chosenXAxis === "age") {
             ageLabel
@@ -338,9 +369,11 @@ function yScale(dataset, chosenYAxis) {
 
         // updates circles with new y values
         circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
-  
+        circlesGroup = renderCircles2(circlesGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis, circletext);
+        
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+        // circletext = updatecircletext(dataset, chosenXAxis, chosenYAxis, circletext)
 
         // changes classes to change bold text
         if (chosenYAxis === "healthcare") {
